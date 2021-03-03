@@ -1,0 +1,16 @@
+{
+  "name": "smak-av-apl",
+  "version": "1.0.0",
+  "description": "",
+  "main": "pres.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "markdown-ast": "^0.2.1",
+    "nearley": "^2.20.1"
+  }
+}
