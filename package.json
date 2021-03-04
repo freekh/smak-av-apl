@@ -11,6 +11,7 @@
   "dependencies": {
     "express": "^4.17.1",
     "markdown-ast": "^0.2.1",
-    "nearley": "^2.20.1"
+    "nearley": "^2.20.1",
+    "nodemon": "^2.0.7"
   }
 }

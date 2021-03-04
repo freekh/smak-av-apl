@@ -1,0 +1,107 @@
+body {
+  background-color: black;
+  color: white;
+  margin: 0 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: Nimbus Sans;
+}
+
+h1,
+h2 {
+  text-decoration: underline;
+  text-align: center;
+}
+
+h1 {
+  padding-top: 25vh;
+}
+
+pre {
+  white-space: break-spaces;
+}
+
+img {
+  max-width: 100%;
+}
+
+main {
+  max-width: 1000px;
+  min-width: 600px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+note {
+  display: none;
+}
+
+blockquote {
+  border-left: grey 4px solid;
+  padding-left: 16px;
+  font-style: oblique;
+}
+
+quote-author {
+  color: grey;
+}
+quote-author::before {
+  content: "- ";
+  padding-left: 40px;
+  text-align: left;
+}
+
+img {
+  align-self: center;
+  padding: 16px;
+}
+
+img[alt="keyboard"] {
+  max-height: 200px;
+}
+
+li {
+  text-align: center;
+}
+
+.k9 {
+  font-size: 16px;
+  font-family: DejaVu Sans Mono;
+  font-weight: 900;
+}
+
+.k9.main {
+  margin: 12px 20px;
+}
+
+.k9.res {
+  color: grey;
+  margin-bottom: 16px;
+}
+
+.k9.ref {
+  color: rgb(199, 33, 0);
+}
+
+.k9.bracket {
+  color: rgb(141, 138, 138);
+}
+
+.k9.lit {
+  color: rgb(143, 175, 0);
+}
+
+.k9.comment {
+  color: rgb(41, 41, 41);
+}
+
+.k9.op {
+  color: rgb(179, 8, 246);
+}
+
+.syntax-dyalog {
+  font-size: 16px;
+  font-family: DejaVu Sans Mono;
+}

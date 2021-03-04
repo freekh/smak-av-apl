@@ -21,10 +21,18 @@ var grammar = {
     {"name": "statement", "symbols": ["par"]},
     {"name": "statement", "symbols": ["op"]},
     {"name": "statement", "symbols": ["array"]},
-    {"name": "array$ebnf$1", "symbols": []},
     {"name": "array$ebnf$1$subexpression$1", "symbols": [{"literal":" "}, "num"]},
-    {"name": "array$ebnf$1", "symbols": ["array$ebnf$1", "array$ebnf$1$subexpression$1"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "array", "symbols": ["num", "array$ebnf$1"]},
+    {"name": "array$ebnf$1", "symbols": ["array$ebnf$1$subexpression$1"]},
+    {"name": "array$ebnf$1$subexpression$2", "symbols": [{"literal":" "}, "num"]},
+    {"name": "array$ebnf$1", "symbols": ["array$ebnf$1", "array$ebnf$1$subexpression$2"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "array", "symbols": ["num", "array$ebnf$1"], "postprocess": 
+        function(data) {
+            return {
+                type: "array",
+                data
+            };
+        }
+        },
     {"name": "ref$ebnf$1", "symbols": [/[a-zA-Z]/]},
     {"name": "ref$ebnf$1", "symbols": ["ref$ebnf$1", /[a-zA-Z]/], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
     {"name": "ref", "symbols": ["ref$ebnf$1"], "postprocess": 
@@ -112,6 +120,11 @@ var grammar = {
     {"name": "dyadic$subexpression$1", "symbols": [{"literal":"*"}]},
     {"name": "dyadic$subexpression$1", "symbols": [{"literal":"&"}]},
     {"name": "dyadic$subexpression$1", "symbols": [{"literal":"_"}]},
+    {"name": "dyadic$subexpression$1", "symbols": [{"literal":","}]},
+    {"name": "dyadic$subexpression$1", "symbols": [{"literal":"%"}]},
+    {"name": "dyadic$subexpression$1", "symbols": [{"literal":">"}]},
+    {"name": "dyadic$subexpression$1", "symbols": [{"literal":"<"}]},
+    {"name": "dyadic$subexpression$1", "symbols": [{"literal":"-"}]},
     {"name": "dyadic", "symbols": ["statement", "dyadic$subexpression$1", "statement"], "postprocess": 
         function(data) {
             return {
@@ -157,11 +170,16 @@ var grammar = {
     {"name": "op$subexpression$1", "symbols": [{"literal":"-"}]},
     {"name": "op$subexpression$1", "symbols": [{"literal":"~"}]},
     {"name": "op", "symbols": ["op$subexpression$1"]},
-    {"name": "apply$ebnf$1$subexpression$1", "symbols": [{"literal":"["}, "statement", {"literal":"]"}]},
-    {"name": "apply$ebnf$1$subexpression$1", "symbols": ["statement"]},
-    {"name": "apply$ebnf$1", "symbols": ["apply$ebnf$1$subexpression$1"], "postprocess": id},
+    {"name": "apply$ebnf$1", "symbols": ["fun"], "postprocess": id},
     {"name": "apply$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "apply", "symbols": ["ref", "fun", "apply$ebnf$1"], "postprocess": 
+    {"name": "apply$ebnf$2$subexpression$1$ebnf$1", "symbols": []},
+    {"name": "apply$ebnf$2$subexpression$1$ebnf$1$subexpression$1", "symbols": [{"literal":";"}, "statement"]},
+    {"name": "apply$ebnf$2$subexpression$1$ebnf$1", "symbols": ["apply$ebnf$2$subexpression$1$ebnf$1", "apply$ebnf$2$subexpression$1$ebnf$1$subexpression$1"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "apply$ebnf$2$subexpression$1", "symbols": [{"literal":"["}, "statement", "apply$ebnf$2$subexpression$1$ebnf$1", {"literal":"]"}]},
+    {"name": "apply$ebnf$2$subexpression$1", "symbols": ["statement"]},
+    {"name": "apply$ebnf$2", "symbols": ["apply$ebnf$2$subexpression$1"], "postprocess": id},
+    {"name": "apply$ebnf$2", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "apply", "symbols": ["ref", "apply$ebnf$1", "apply$ebnf$2"], "postprocess": 
         function(data) {
             return {
                 type: "apply",

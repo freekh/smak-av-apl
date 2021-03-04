@@ -1,59 +1,49 @@
 # En smak av APL
 
+> We would like to have you discover a new land, a land where people who may or may not be specialists in programming can process their data, build computerised applications, and take pleasure in using a programming language which is an extremely elegant and powerful tool of thought.
+
+<quote-author>Mastering Dyalog APL</quote-author>
+
 ---
 
-## Intro
+# Disclaimer
 
-Første APLen ble lagd på 50 talllet. Kjennetegn weird syntax :) og multi dimensjonelle array "basert"
+> Ikke en APL spesialist
 
-Ganske populært på 70 tallet.
-De fleste APLer er vel det man (jeg) idag vil kalle en esoterisk programmeringsspråk.
+<quote-author>Fredrik</quote-author>
 
-![](http://www.aplusdev.org/keyboard.gif)
+<note>Jeg ville snakke om APL fordi jeg har hatt lyst til å lære meg noe nytt en stund</note>
 
-La oss ta en kjapp titt på et par av de:
+---
+
+## OMG TLTR;
+
+<note>too lame to read</note>
+
+- Rare symboler
+- Rar syntax
+- Multidimensjonal array / matrise basert
+- **Nydelig** retro holdning
 
 ### Dyalog
 
-TODO: eksempel
-https://www.dyalog.com/uploads/documents/MasteringDyalogAPL.pdf
-
----
+```dyalog
+Plus ← {⍺+⍵}
+Times ← {⍺×⍵}
+```
 
 ### K
 
-The man, the legend
-Arthur Whitney
-
-kdb dropper vi for øyeblikket
-
-Idioms!
-
-Både Dyalog og K ble lagd på et tidspunkt der tanken var at hvem-som-helst skulle plukke det.
-I et alternativt univers har man sikkert ingen profesjonelle utviklere og banker som bare kjører alt i APL.
-
-Det er derfor det er så ironisk at det nettopp er ekstremt vanskelig å lese.
-
-Ville bare si litt om historien her fordi jeg synes det er litt ekstra morsomt.
-
-Monadisk, dyadisk
-Endelig en definisjon på monadisk som alle kan forstå :D
-
-Gullkorn:
-Om hvorfor APL parser omvendt av andre språk :)
-
-```
-It  may  take  a  little  while  to  get  used  to  this  slightly  unfamiliar  rule,  but  once  it  has  been learned it is really a great advantage because you can direct your energy towards solving your problem  and  not  have  to  remember  complex  rules  just  to  satisfy  the  computer's  need  for guidance.
-```
-
-In a list of numbers, find the two entries that sum to 2020 and then multiply those two numbers together.
-
 ```k
-i:`i$'0:"1_input.txt"
-f:{*(~)_x'i}
-/ halllo
-f{f{(2020=x+y)*x*y}x}
+s:4225 1619 3706 2240 2076 1389 3916 3918 4939 2735
+c:3 1 3 2 2 1 3 3 3 2
+r:8 5 2%100
+s*r[c]
 ```
+
+---
+
+## K: all the docs 😂
 
 ```
 *ffi: a:"./a.so"5:`f!"ii";a.f[2;3] / int f(int i,int j){return i+j;}
@@ -89,8 +79,212 @@ sqrt sqr exp log sin cos div mod bar in bin
 /comment \trace [:return 'signal if do while] \\exit
 ```
 
-Interresante nye måter å tenke på rundt array. La oss ta en titt på dette idiomet som tok meg litt tid å finne ut av:
+---
+
+## K (cont'ed)
+
+#### Operasjoner over arrays:
+
+```k
+r:8 5 2%100
+r
+```
+
+#### Funksjoner:
+
+```k
+f:{x+1}
+f[2]
+```
+
+#### Index operasjoner:
+
+```k
+a:1 2 3
+a[0]
+```
+
+---
+
+## K (cont'ed)
+
+```k
+salary:4225 1619 3706 2240 2076 1389 3916 3918 4939 2735
+category:3 1 3 2 2 1 3 3 3 2
+rate:8 5 2%100
+salary*rate[category]
+```
+
+#### Idiomatisk (!):
+
+```k
+s:4225 1619 3706 2240 2076 1389 3916 3918 4939 2735
+c:3 1 3 2 2 1 3 3 3 2
+r:8 5 2%100
+s*r[c]
+```
+
+---
+
+## Mer fun facts
+
+### Monadic
+
+```k
+#1 2 3
+```
+
+### Dyadic
+
+```k
+2#3
+```
+
+---
+
+## Case studie: alle kombinasjoner
+
+#### 1.
+
+```k
+#1 2 3
+```
+
+#### 2.
+
+```k
+2##1 2 3
+```
+
+#### 3.
 
 ```k
 !2##1 2 3
 ```
+
+---
+
+## Case studie: AOC
+
+> In a list of numbers, find the two entries that sum to 2020 and then multiply those two numbers together.
+
+#### En (min) løsning på dag 1, del 1:
+
+```k
+i:1721 979 366 299 675 1456
+f:{*(~)_x'i} / first non-null in i for a function x
+f{f{(2020=x+y)*x*y}x}
+```
+
+---
+
+## Prelude utils
+
+#### Funksjoner med > 1 args:
+
+```k
+sumorzero:{2020=x+y}
+sumorzero[1721;299]
+```
+
+#### Map:
+
+```k
+i:1721 979 366 299 675 1456
+{x>700}'i
+```
+
+#### Ta alle over 700:
+
+```k
+i:1721 979 366 299 675 1456
+(~)_{x>700}'i
+```
+
+#### Ta den første:
+
+```k
+i:1721 979 366 299 675 1456
+*i
+```
+
+---
+
+## Case studie: AOC (cont'ed)
+
+> In a list of numbers, **find the two entries that sum to 2020** and then multiply those two numbers together.
+
+#### Nå kan vi lage f:
+
+```k
+i:1721 979 366 299 675 1456
+f:{*(~)_x'i} / first non-null in i for a function x
+f{2020=x+y}[366]
+```
+
+#### Den vi ser etter:
+
+```k
+i:1721 979 366 299 675 1456
+f:{*(~)_x'i} /  first non-null in i for a function x
+f{2020=x+y}[299]
+```
+
+#### 1 betyr vi fant, så lag resultat:
+
+```k
+i:1721 979 366 299 675 1456
+f:{*(~)_x'i} /  first non-null in i for a function x
+f{(2020=x+y)*x*y}[299]
+```
+
+---
+
+## Case studie: AOC (cont'ed)
+
+#### Gjør det samme for ALLE:
+
+```k
+i:1721 979 366 299 675 1456
+f:{*(~)_x'i} / first non-null in i for a function x
+{f{(2020=x+y)*x*y}x}'i
+```
+
+#### Ta den første ikke null av ALLE:
+
+```k
+i:1721 979 366 299 675 1456
+f:{*(~)_x'i} / first non-null in i for a function x
+f{f{(2020=x+y)*x*y}x}
+```
+
+---
+
+# Takk!
+
+<note>
+
+Si noe Arthur Whitney?
+
+kdb dropper vi for øyeblikket
+
+Idioms! MMosomt!
+
+Både Dyalog og K ble lagd på et tidspunkt der tanken var at hvem-som-helst skulle plukke det.
+I et alternativt univers har man sikkert ingen profesjonelle utviklere og banker som bare kjører alt i APL.
+
+Det er derfor det er så ironisk at det nettopp er ekstremt vanskelig å lese.
+
+Ville bare si litt om historien her fordi jeg synes det er litt ekstra morsomt.
+
+Monadisk, dyadisk
+Endelig en definisjon på monadisk som alle kan forstå :D
+
+Gullkorn:
+Om hvorfor APL parser omvendt av andre språk :)
+
+```
+It  may  take  a  little  while  to  get  used  to  this  slightly  unfamiliar  rule,  but  once  it  has  been learned it is really a great advantage because you can direct your energy towards solving your problem  and  not  have  to  remember  complex  rules  just  to  satisfy  the  computer's  need  for guidance.
+```
+
+</note>

@@ -43,17 +43,29 @@ function kToHtml(nodes) {
     if (!node?.type) {
       switch (node) {
         case "{":
-          return span("grey", node);
+          return span("bracket", node);
         case "}":
-          return span("grey", node);
+          return span("bracket", node);
         case "[":
-          return span("grey", node);
+          return span("bracket", node);
         case "]":
-          return span("grey", node);
-        case "] ":
-          return span("grey", node);
+          return span("bracket", node);
+        case ")":
+          return span("bracket", node);
+        case "(":
+          return span("bracket", node);
         case ";":
-          return span("grey", node);
+          return span("bracket", node);
+        case "~":
+          return span("op", node);
+        case "*":
+          return span("op", node);
+        case "'":
+          return span("op", node);
+        case "+":
+          return span("op", node);
+        case "_":
+          return span("op", node);
         default:
           return node;
       }
@@ -89,6 +101,9 @@ function kToHtml(nodes) {
 
 async function nodeToHtml(node) {
   switch (node.type) {
+    case "list":
+      return `<li>${await blockToHtml(node.block)}</li>`;
+
     case "title":
       switch (node.rank) {
         case 1:
@@ -100,8 +115,22 @@ async function nodeToHtml(node) {
         default:
           return `<h4>${await blockToHtml(node.block)}</h4>`;
       }
+    case "bold":
+      return `<b>${
+        node.block.length === 1 && node.block[0].type === "text"
+          ? node.block[0].text
+          : await blockToHtml(node.block)
+      }</b>`;
+    case "italic":
+      return `<i>${
+        node.block.length === 1 && node.block[0].type === "text"
+          ? node.block[0].text
+          : await blockToHtml(node.block)
+      }</i>`;
     case "text":
-      return `<p>${node.text}</p>`;
+      return node.text;
+    case "quote":
+      return `<blockquote>${await blockToHtml(node.block)}</blockquote>`;
     case "image":
       return `<img src="${node.url}" alt="${node.alt}"/>`;
     case "break":
@@ -128,11 +157,11 @@ async function nodeToHtml(node) {
         );
         console.log(res);
         const resHtml = res.result
-          ? `<div class="k9 res">${res.result}</div>`
+          ? `<div class="k9 res">> ${res.result}</div>`
           : "";
         return `<div class="k9 main">${k9.join("")}</div>` + resHtml;
       }
-      return `<pre>${node.code}</pre>`;
+      return `<pre class="syntax-${node.syntax}">${node.code}</pre>`;
     default:
       return JSON.stringify(node, null, 2);
   }
@@ -142,8 +171,6 @@ async function blockToHtml(nodes) {
   const htmlNodes = await Promise.all(nodes.map((node) => nodeToHtml(node)));
   return htmlNodes.join("\n");
 }
-
-const STYLES_URL = "/styles.css";
 
 let htmlSlides;
 let now;
@@ -162,24 +189,48 @@ function transform(pres) {
   }
   return Promise.all(
     astSlides.map(
-      async (slide) => `
+      async (slide, i) => `
 <html>
   <head>
-    <link rel="stylesheet" type="text/css" href="${STYLES_URL}" media="screen"/>
+    <link rel="stylesheet" type="text/css" href="/styles.css" media="screen"/>
+    <title>En Smak Av APL</title>
   </head>
   <body>
+  <main>
   ${await blockToHtml(slide)}
+  </main>
   </body>
   <script>
-    // hot reload - YEAH!
-    const thisBuild = { now: ${now} };
-    setInterval(async () => {
-      const res = await fetch('/build')
-      const { now } = await res.json();
-      if (now && thisBuild.now !== now) {
-        window.location.reload();
+    // slide nav
+    document.addEventListener('keydown', function(event) {
+      const key = event.key; // "ArrowRight", "ArrowLeft", "ArrowUp", or "ArrowDown"
+      let nextSlide = ${i};
+      if (key === 'ArrowRight' || key === 'ArrowUp') {
+        nextSlide += 1
+      } else if (key === 'ArrowLeft' || key === 'ArrowDown') {
+        nextSlide -= 1
       }
-    }, 100);
+      if (nextSlide !== ${i} && nextSlide >= 0 && nextSlide < ${
+        astSlides.length
+      }) {
+        const url = '/' + nextSlide;
+        window.location.replace(url);
+      }
+    });
+    
+    // hot reload - YEAH!
+    const buildTime =  ${now}
+    setInterval(async () => {
+      try {
+        const res = await fetch('/build')
+        const { now } = await res.json();
+        if (now && buildTime < now) {
+          window.location.reload();
+        } 
+      } catch (e) {
+        //
+      }
+    }, 500);
   </script>
 </html>
   `
@@ -189,16 +240,13 @@ function transform(pres) {
 
 const express = require("express");
 const app = express();
+app.use(express.static("public"));
 
 app.get("/build", (req, res) => {
   res.send({ now });
 });
 
 app.post("/k", (req, res) => {});
-
-app.get(STYLES_URL, async (req, res) => {
-  res.sendFile(`${__dirname}/styles.css`);
-});
 
 app.get("/", (req, res) => {
   res.redirect("/0");
@@ -208,10 +256,9 @@ app.get("/:slide", async (req, res) => {
   const slide = req.params.slide || 0;
   while (!htmlSlides) {
     console.log("Computing...");
-    await new Promise((resolve) => setTimeout((resolve) => 100));
+    await new Promise((resolve) => setTimeout(() => resolve(), 100));
   }
   const html = htmlSlides[slide];
-  // console.log(html);
   res.header("Content-Type", "text/html").send(html);
 });
 

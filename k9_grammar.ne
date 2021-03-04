@@ -1,6 +1,13 @@
 main -> statement
 statement -> monadic | dyadic | triadic | def | stdin | ref | num | intparse | apply | fun | cond | comment | par | op | array
-array -> num (" " num):*
+array -> num (" " num):+ {%
+    function(data) {
+        return {
+            type: "array",
+            data
+        };
+    }
+%}
 ref -> [a-zA-Z]:+ {%
     function(data) {
         return {
@@ -65,7 +72,7 @@ par -> "(" statement ")" {%
         };
     }
 %}
-dyadic -> statement ("'" | "=" | "#" | "+" | "*" | "&" | "_") statement {%
+dyadic -> statement ("'" | "=" | "#" | "+" | "*" | "&" | "_" | "," | "%" | ">" | "<" |"-") statement {%
     function(data) {
         return {
             type: "dyadic",
@@ -98,7 +105,7 @@ fun -> "{" ("[" args "] "):? statement "}" {%
     }
 %}
 op -> ("=" | "+" | "-" | "~")
-apply -> ref fun ("[" statement "]" | statement):? {%
+apply -> ref fun:? ("[" statement (";" statement):* "]" | statement):? {%
     function(data) {
         return {
             type: "apply",
